@@ -1,0 +1,15 @@
+﻿@model HomeModel
+@{
+    ViewData["Title"] = "All People";
+}
+
+@foreach (var person in Model.People)
+{
+	<form action="/home/changename" method="post">
+		<p>@person.Name</p>
+		<input style="display: none;" name="streamid" value="@person.Id"/>
+		<label for="changeName">Change Name</label>
+		<input id="changeName" name="name" value=""/>
+		<button type="submit">Save</button>
+	</form>
+}
