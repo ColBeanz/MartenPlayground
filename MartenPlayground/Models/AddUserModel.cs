@@ -1,9 +1,9 @@
-﻿using MartenPlayground.DataAccess.Models;
+﻿using System;
 
 namespace MartenPlayground.Models
 {
 	public class AddUserModel
 	{
-		public Person Person { get; set; }
+		public string Name { get; set;}
 	}
 }

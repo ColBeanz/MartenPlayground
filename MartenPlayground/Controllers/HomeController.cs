@@ -2,9 +2,11 @@
 using System.Diagnostics;
 using MartenPlayground.DataAccess.Databases;
 using MartenPlayground.DataAccess.Events;
-using MartenPlayground.DataAccess.Models;
+using MartenPlayground.DataAccess.Streams;
 using Microsoft.AspNetCore.Mvc;
 using MartenPlayground.Models;
+using MartenPlayground.DataAccess.Models;
+using System.Linq;
 
 namespace MartenPlayground.Controllers
 {
@@ -22,7 +24,12 @@ namespace MartenPlayground.Controllers
 			
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
-				model.People = session.Query<Person>();
+				model.People = session.Query<PersonAggregate>()
+					.Select(x => new HomeModel.Person 
+					{
+						Id = x.Id,
+						Name = x.Name
+					});
 			}
 
 			return View(model);
@@ -30,20 +37,27 @@ namespace MartenPlayground.Controllers
 
 		public IActionResult AddUser()
 		{
-			var personCreated = new PersonCreated {Id = Guid.NewGuid(), Name = "Some name " + new Random().Next(1, 1000)};
+			return View(new AddUserModel());
+		}
+
+		[HttpPost]
+		public IActionResult AddUser(string name)
+		{
+			var personCreated = new PersonCreated();
+			var nameChanged = new ChangeName { Name = name };
 
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
-				session.Events.StartStream<Person>(Guid.NewGuid(), personCreated);
+				session.Events.StartStream<Person>(Guid.NewGuid(), personCreated, nameChanged);
 				session.SaveChanges();
 			}
-			return View(new AddUserModel{ Person = new Person{Id = personCreated.Id, Name = personCreated.Name} });
+			return Redirect("/home/index");
 		}
 
 		[HttpPost]
 		public IActionResult ChangeName(Guid streamId, string name)
 		{
-			var changeName = new ChangeName { Id = Guid.NewGuid(), Name = "Some name " + new Random().Next(1, 1000) };
+			var changeName = new ChangeName { Id = Guid.NewGuid(), Name = name };
 
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
@@ -53,9 +67,15 @@ namespace MartenPlayground.Controllers
 			return Redirect("/home/index");
 		}
 
-		public IActionResult Privacy()
+		public IActionResult PreviousNames(Guid streamId)
 		{
-			return View();
+			var model = new PreviousNamesModel();
+
+			using (var session = this.database.GetDocumentStore().LightweightSession())
+			{
+				model.PreviousNames = session.Query<PreviousName>().Where(x => x.StreamId == streamId).ToList();
+			}
+			return View(model);
 		}
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -3,5 +3,7 @@
 	ViewData["Title"] = "Add User";
 }
 
-
-@Model.Person.Name
+<form method="post" action="/home/adduser">
+	<input name="name" value=""/>
+	<button type="submit">Add</button>
+</form>

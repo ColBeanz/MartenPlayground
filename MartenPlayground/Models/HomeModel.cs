@@ -1,10 +1,16 @@
+using System;
 using System.Collections.Generic;
-using MartenPlayground.DataAccess.Models;
 
 namespace MartenPlayground.Models
 {
 	public sealed class HomeModel
 	{
 		public IEnumerable<Person> People { get; set; }
+
+		public class Person
+		{
+			public Guid Id { get; set;}
+			public string Name { get; set;}
+		}
 	}
 }

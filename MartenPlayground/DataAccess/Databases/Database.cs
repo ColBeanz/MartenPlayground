@@ -14,11 +14,13 @@ namespace MartenPlayground.DataAccess.Databases
 			{
 				o.Connection("host=localhost;port=4321;database=martenplayground;password=password;username=postgres");
 				o.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
-				o.RegisterDocumentType<Person>();
 
 				o.Events.DatabaseSchemaName = "events";
 				o.Events.AddEventType(typeof(PersonCreated));
 				o.Events.AddEventType(typeof(ChangeName));
+
+				o.Events.InlineProjections.AggregateStreamsWith<PersonAggregate>();
+				o.Events.InlineProjections.TransformEvents(new ChangeNameTransform());
 			});
 		}
 

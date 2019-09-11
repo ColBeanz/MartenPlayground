@@ -1,0 +1,17 @@
+﻿@using System.Linq
+@model PreviousNamesModel
+
+@{
+    ViewData["Title"] = "Previous Names";
+}
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.PreviousNames.Any())
+{
+    @foreach (var previousName in Model.PreviousNames)
+    {
+        <p>@previousName.Name</p>
+    }
+} else {
+    <p>Person has no previous names</p>
+}
