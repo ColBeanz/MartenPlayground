@@ -10,11 +10,11 @@ using System.Linq;
 
 namespace MartenPlayground.Controllers
 {
-	public class HomeController : Controller
+	public class EventSourceController : Controller
 	{
 		readonly IDatabase database;
 
-		public HomeController(IDatabase database)
+		public EventSourceController(IDatabase database)
 		{
 			this.database = database;
 		}
@@ -29,7 +29,7 @@ namespace MartenPlayground.Controllers
 					{
 						Id = x.Id,
 						Name = x.Name
-					});
+					}).ToList();
 			}
 
 			return View(model);
@@ -43,37 +43,53 @@ namespace MartenPlayground.Controllers
 		[HttpPost]
 		public IActionResult AddUser(string name)
 		{
-			var personCreated = new PersonCreated();
-			var nameChanged = new ChangeName { Name = name };
+			var personCreated = new PersonCreated(){ Name = name};
 
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
-				session.Events.StartStream<Person>(Guid.NewGuid(), personCreated, nameChanged);
+				session.Events.StartStream<Person>(personCreated);
 				session.SaveChanges();
 			}
-			return Redirect("/home/index");
+			return Redirect("/eventsource/index");
 		}
 
 		[HttpPost]
-		public IActionResult ChangeName(Guid streamId, string name)
+		public IActionResult CommitCrime(Guid streamId, string crime)
 		{
-			var changeName = new ChangeName { Id = Guid.NewGuid(), Name = name };
+			var crimeCommited = new CrimeCommited { Crime = crime };
 
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
-				session.Events.Append(streamId, changeName);
+				session.Events.Append(streamId, crimeCommited);
 				session.SaveChanges();
 			}
-			return Redirect("/home/index");
+			return Redirect("/eventsource/index");
 		}
 
-		public IActionResult PreviousNames(Guid streamId)
+		public IActionResult PreviousCrimes(Guid streamId)
 		{
-			var model = new PreviousNamesModel();
+			var model = new PreviousCrimesModel();
 
 			using (var session = this.database.GetDocumentStore().LightweightSession())
 			{
-				model.PreviousNames = session.Query<PreviousName>().Where(x => x.StreamId == streamId).ToList();
+				model.PreviousCrimes = session.Query<CommitedCrime>().Where(x => x.StreamId == streamId).ToList();
+			}
+			return View(model);
+		}
+
+		public IActionResult GetAllEvents(Guid streamId)
+		{
+			var model = new GetAllEventsModel();
+
+			using (var session = this.database.GetDocumentStore().LightweightSession())
+			{
+				model.Events = session.Events.FetchStream(streamId).Select(x => new Models.GetAllEventsModel.GetAllEventModel
+				{
+					EventId = x.Id,
+					StreamId = x.StreamId,
+					SequenceNumber = x.Sequence,
+					EventName = x.ToString()
+				});
 			}
 			return View(model);
 		}

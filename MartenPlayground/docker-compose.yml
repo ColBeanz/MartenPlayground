@@ -1,0 +1,11 @@
+version: "2.4"
+services:
+  marten-playground-database:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=martenplayground
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    restart: unless-stopped
+    ports:
+      - 4321:4321

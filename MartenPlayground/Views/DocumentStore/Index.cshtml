@@ -1,0 +1,18 @@
+﻿@model HomeModel
+@{
+    ViewData["Title"] = "All People";
+}
+
+@foreach (var person in Model.People)
+{
+	<form action="/documentstore/commitcrime" method="post">
+		<h3>@person.Name</h3>
+		<input style="display: none;" name="userId" value="@person.Id"/>
+		<label for="commitCrime">Commit Crime</label>
+		<input id="commitCrime" name="crime" value=""/>
+		<button type="submit">Do Crime</button>
+		<a href="/documentstore/previouscrimes?userId=@person.Id">Previous Crimes</a>
+	</form>
+}
+
+<a href="/documentstore/adduser">Add a new Person</a>

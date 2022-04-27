@@ -17,10 +17,13 @@ namespace MartenPlayground.DataAccess.Databases
 
 				o.Events.DatabaseSchemaName = "events";
 				o.Events.AddEventType(typeof(PersonCreated));
-				o.Events.AddEventType(typeof(ChangeName));
+				o.Events.AddEventType(typeof(CrimeCommited));
 
 				o.Events.InlineProjections.AggregateStreamsWith<PersonAggregate>();
-				o.Events.InlineProjections.TransformEvents(new ChangeNameTransform());
+				o.Events.InlineProjections.TransformEvents(new CrimesCommitedTransform());
+
+				o.Schema.For<User>();
+				o.Schema.For<Crime>();
 			});
 		}
 

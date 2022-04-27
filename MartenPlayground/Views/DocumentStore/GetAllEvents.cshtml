@@ -1,0 +1,21 @@
+﻿@using System.Linq
+@model GetAllEventsModel
+
+@{
+    ViewData["Title"] = "Get All Events";
+}
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.Events.Any())
+{
+    @foreach (var anEvent in Model.Events)
+    {
+        <p>EventId: @anEvent.EventId</p>
+        <p>StreamId: @anEvent.StreamId</p>
+        <p>EventName: @anEvent.EventName</p>
+        <p>SequenceNumber: @anEvent.SequenceNumber</p>
+        <br>
+    }
+} else {
+    <p>No Events Found</p>
+}
