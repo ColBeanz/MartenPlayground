@@ -12,7 +12,6 @@ namespace MartenPlayground.DataAccess.Events
 		public static void ConfigureMarten(DocumentMapping<CrimeCommited> mapping)
 		{
 			mapping.DatabaseSchemaName = "events";
-			mapping.IdStrategy = new CombGuidIdGeneration();
 		}
 	}
 }

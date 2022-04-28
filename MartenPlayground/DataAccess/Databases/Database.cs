@@ -15,6 +15,7 @@ namespace MartenPlayground.DataAccess.Databases
 				o.Connection("host=localhost;port=4321;database=martenplayground;password=password;username=postgres");
 				o.AutoCreateSchemaObjects = AutoCreate.CreateOrUpdate;
 
+				// Event Store stuff
 				o.Events.DatabaseSchemaName = "events";
 				o.Events.AddEventType(typeof(PersonCreated));
 				o.Events.AddEventType(typeof(CrimeCommited));
@@ -22,6 +23,7 @@ namespace MartenPlayground.DataAccess.Databases
 				o.Events.InlineProjections.AggregateStreamsWith<PersonAggregate>();
 				o.Events.InlineProjections.TransformEvents(new CrimesCommitedTransform());
 
+				// Document Store stuff
 				o.Schema.For<User>();
 				o.Schema.For<Crime>();
 			});
